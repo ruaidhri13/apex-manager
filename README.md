@@ -2,10 +2,9 @@
 
 > A full-stack SaaS solution for managing commercial race track facilities, handling real-time booking concurrency, exclusive resource locking, and dynamic pricing.
 
-![Project Banner](https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?q=80&w=1000&auto=format&fit=crop)
-*(Optional: Replace this line with a GIF of your 3D Carousel & Booking Flow)*
+<img width="2816" height="1536" alt="Track_A" src="https://github.com/user-attachments/assets/87509ed4-74e2-4e3e-ba05-c00e00021ca9" />
 
-## 🚀 The Engineering Challenge
+# 🚀 The Engineering Challenge
 Booking systems are easy until you add **concurrency** and **exclusive resources**. 
 ApexManager solves the "Double Booking" problem where multiple users compete for limited track time. It enforces complex business rules:
 1.  **Exclusivity Locks:** Prevents public walk-ins during Private Events.
@@ -16,7 +15,7 @@ ApexManager solves the "Double Booking" problem where multiple users compete for
 * **Backend:** Java 21, Spring Boot 3.4, Hibernate/JPA
 * **Database:** PostgreSQL (Relational Schema with constraints)
 * **Frontend:** React.js + Vite (Custom 3D CSS Carousel)
-* **DevOps:** Docker (Containerization)
+* **DevOps:** Docker (Containerisation)
 
 ## ✨ Key Features
 * **3D Showroom UI:** Custom CSS-only 3D carousel for track selection.
@@ -25,7 +24,7 @@ ApexManager solves the "Double Booking" problem where multiple users compete for
 * **Dynamic Pricing:** Admin dashboard to adjust per-person rates and walk-in fees in real-time.
 
 ## 📸 Screenshots
-*(Upload screenshots of your Dashboard, the Dark Mode Grid, and the Settings page here)*
+<img width="1672" height="873" alt="Screenshot 2025-12-06 at 05 40 17" src="https://github.com/user-attachments/assets/79cc4d35-c3d3-4700-a6d5-4824cb0ed790" />
 
 ## ⚡ Getting Started
 ### Prerequisites
