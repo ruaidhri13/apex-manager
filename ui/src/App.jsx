@@ -2,19 +2,35 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import './App.css'
 
-function App() {
-    const [tracks, setTracks] = useState([])
-    const [selectedTrack, setSelectedTrack] = useState(null) // Which track is clicked?
+const TRACK_IMAGES = {
+    1: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?q=80&w=1000&auto=format&fit=crop",
+    2: "https://images.unsplash.com/photo-1511994714008-b6d68a8b32a2?q=80&w=1000&auto=format&fit=crop",
+    3: "https://images.unsplash.com/photo-1596568288590-b186b51c3859?q=80&w=1000&auto=format&fit=crop"
+}
 
-    // Form State
+function App() {
+    const [activeView, setActiveView] = useState("overview")
+    const [tracks, setTracks] = useState([])
+    const [bookings, setBookings] = useState([]) // New State for Bookings
+    const [selectedTrack, setSelectedTrack] = useState(null)
+
+    // Booking Form State
     const [driverCount, setDriverCount] = useState(1)
     const [bookingType, setBookingType] = useState("WALK_IN")
     const [startTime, setStartTime] = useState("")
     const [endTime, setEndTime] = useState("")
 
+    // Initial Load
     useEffect(() => {
         fetchTracks()
     }, [])
+
+    // Smart Fetching: Only fetch bookings when we look at the calendar
+    useEffect(() => {
+        if (activeView === "calendar") {
+            fetchBookings()
+        }
+    }, [activeView])
 
     const fetchTracks = () => {
         axios.get('http://localhost:8080/api/tracks')
@@ -22,89 +38,209 @@ function App() {
             .catch(error => console.error("Error:", error))
     }
 
-    const handleBookClick = (track) => {
-        setSelectedTrack(track)
-        // Reset form defaults
-        setDriverCount(1)
-        setBookingType("WALK_IN")
+    const fetchBookings = () => {
+        axios.get('http://localhost:8080/api/bookings')
+            .then(response => setBookings(response.data))
+            .catch(error => console.error("Error fetching bookings:", error))
+    }
+
+    // --- ACTIONS ---
+
+    const handleUpdatePrice = (trackId, newPrice, type) => {
+        // Find the track to get its current values
+        const track = tracks.find(t => t.id === trackId)
+        const updatedTrack = { ...track }
+
+        if (type === 'walkin') updatedTrack.walkinPrice = newPrice
+        if (type === 'private') updatedTrack.privateHourlyRatePp = newPrice
+
+        // Call API to save
+        axios.put(`http://localhost:8080/api/tracks/${trackId}`, updatedTrack)
+            .then(() => {
+                alert("Price Updated Successfully")
+                fetchTracks() // Refresh data
+            })
+            .catch(err => alert("Update failed"))
     }
 
     const submitBooking = (e) => {
-        e.preventDefault() // Stop page reload
-
-        // Create the JSON object exactly how Java expects it
+        e.preventDefault()
         const bookingData = {
             track: { id: selectedTrack.id },
             bookingType: bookingType,
-            startTime: startTime, // datetime-local string (e.g. "2025-06-14T10:00")
+            startTime: startTime,
             endTime: endTime,
             driverCount: parseInt(driverCount),
-            totalPrice: 50.00, // Hardcoded for MVP
+            totalPrice: 50.00,
             status: "CONFIRMED"
         }
 
         axios.post('http://localhost:8080/api/bookings', bookingData)
             .then(response => {
                 alert("Booking Successful! ID: " + response.data.id)
-                setSelectedTrack(null) // Close the form
+                setSelectedTrack(null)
+                // If we are on calendar view, refresh it
+                if (activeView === "calendar") fetchBookings()
             })
             .catch(error => {
-                // If Java throws an error (like "Sacred Time"), we catch it here
                 alert("Booking Failed: " + (error.response?.data || error.message))
             })
     }
 
-    return (
-        <div className="container">
-            <h1>Apex Racing Manager</h1>
+    // --- VIEW RENDERING ---
 
-            {/* 1. THE TRACK LIST */}
-            <div className="track-list">
-                {tracks.map(track => (
-                    <div key={track.id} className="track-card" style={{ border: '1px solid #ccc', padding: '15px', margin: '10px' }}>
-                        <h2>{track.name}</h2>
-                        <p><strong>Max Karts:</strong> {track.maxKarts}</p>
-                        <button onClick={() => handleBookClick(track)}>Book This Track</button>
+    const renderContent = () => {
+        // 1. OVERVIEW TAB
+        if (activeView === "overview") {
+            return (
+                <div className="track-grid">
+                    {tracks.map(track => (
+                        <div key={track.id} className="track-card">
+                            <div className="card-image" style={{ backgroundImage: `url(${TRACK_IMAGES[track.id]})` }}>
+                                <span className="badge">{track.maxKarts} Kart Fleet</span>
+                            </div>
+                            <div className="card-body">
+                                <div className="card-header">
+                                    <h2>{track.name}</h2>
+                                    <span className="price">£{track.walkinPrice}<small>/lap</small></span>
+                                </div>
+                                <div className="fleet-visual">
+                                    <span className="label">Live Fleet Status</span>
+                                    <div className="kart-grid">
+                                        {Array.from({ length: track.maxKarts }).map((_, i) => (
+                                            <span key={i} className="kart-dot" title={`Kart #${i+1}`}></span>
+                                        ))}
+                                    </div>
+                                </div>
+                                <button onClick={() => { setSelectedTrack(track); setDriverCount(1); }}>Book Track</button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )
+        }
+
+        // 2. BOOKINGS TAB (Real Data Table)
+        else if (activeView === "calendar") {
+            return (
+                <div className="table-container">
+                    <table className="booking-table">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Track</th>
+                            <th>Type</th>
+                            <th>Start Time</th>
+                            <th>Drivers</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {bookings.map(b => (
+                            <tr key={b.id}>
+                                <td>#{b.id}</td>
+                                <td>{b.track.name}</td>
+                                <td><span className={`status-badge ${b.bookingType}`}>{b.bookingType}</span></td>
+                                <td>{new Date(b.startTime).toLocaleString()}</td>
+                                <td>{b.driverCount}</td>
+                                <td>{b.status}</td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                    {bookings.length === 0 && <p style={{textAlign: 'center', marginTop: '20px'}}>No bookings found.</p>}
+                </div>
+            )
+        }
+
+        // 3. SETTINGS TAB (Price Manager)
+        else if (activeView === "settings") {
+            return (
+                <div className="settings-panel">
+                    <h2>⚙️ Pricing Manager</h2>
+                    <div className="settings-grid">
+                        {tracks.map(track => (
+                            <div key={track.id} className="setting-card">
+                                <h3>{track.name}</h3>
+                                <div className="setting-row">
+                                    <label>Walk-in Price (£)</label>
+                                    <input
+                                        type="number"
+                                        defaultValue={track.walkinPrice}
+                                        onBlur={(e) => handleUpdatePrice(track.id, e.target.value, 'walkin')}
+                                    />
+                                </div>
+                                <div className="setting-row">
+                                    <label>Private Rate (£/pp)</label>
+                                    <input
+                                        type="number"
+                                        defaultValue={track.privateHourlyRatePp}
+                                        onBlur={(e) => handleUpdatePrice(track.id, e.target.value, 'private')}
+                                    />
+                                </div>
+                            </div>
+                        ))}
                     </div>
-                ))}
-            </div>
+                </div>
+            )
+        }
+    }
 
-            {/* 2. THE BOOKING FORM POPUP */}
+    return (
+        <div className="dashboard">
+            <aside className="sidebar">
+                <div className="logo">🏎️ ApexManager</div>
+                <nav>
+                    <button className={activeView === "overview" ? "active" : ""} onClick={() => setActiveView("overview")}>🏁 Track Overview</button>
+                    <button className={activeView === "calendar" ? "active" : ""} onClick={() => setActiveView("calendar")}>📅 Bookings</button>
+                    <button className={activeView === "settings" ? "active" : ""} onClick={() => setActiveView("settings")}>⚙️ Settings</button>
+                </nav>
+            </aside>
+
+            <main className="main-content">
+                <header>
+                    <h1>{activeView === "overview" ? "Facility Status" : activeView.charAt(0).toUpperCase() + activeView.slice(1)}</h1>
+                    <button className="refresh-btn" onClick={() => window.location.reload()}>↻ Refresh System</button>
+                </header>
+
+                {renderContent()}
+            </main>
+
+            {/* MODAL FORM */}
             {selectedTrack && (
-                <div className="booking-form" style={{ marginTop: '20px', borderTop: '2px solid black', padding: '20px' }}>
-                    <h3>Booking {selectedTrack.name}</h3>
-                    <form onSubmit={submitBooking}>
-
-                        <label>
-                            Type:
-                            <select value={bookingType} onChange={e => setBookingType(e.target.value)}>
-                                <option value="WALK_IN">Public Walk-In</option>
-                                <option value="PRIVATE">Private Event</option>
-                            </select>
-                        </label>
-                        <br /><br />
-
-                        <label>
-                            Start Time:
-                            <input type="datetime-local" required onChange={e => setStartTime(e.target.value)} />
-                        </label>
-                        <br /><br />
-
-                        <label>
-                            End Time:
-                            <input type="datetime-local" required onChange={e => setEndTime(e.target.value)} />
-                        </label>
-                        <br /><br />
-
-                        <label>
-                            Drivers:
-                            <input type="number" min="1" max={selectedTrack.maxKarts} value={driverCount} onChange={e => setDriverCount(e.target.value)} />
-                        </label>
-                        <br /><br />
-
-                        <button type="submit" style={{ backgroundColor: 'green', color: 'white' }}>Confirm Booking</button>
-                        <button type="button" onClick={() => setSelectedTrack(null)} style={{ marginLeft: '10px' }}>Cancel</button>
-                    </form>
+                <div className="modal-overlay">
+                    <div className="booking-form">
+                        <div className="form-header">
+                            <h3>Book {selectedTrack.name}</h3>
+                            <button className="close-x" onClick={() => setSelectedTrack(null)}>×</button>
+                        </div>
+                        <form onSubmit={submitBooking}>
+                            <div className="form-group">
+                                <label>Event Type</label>
+                                <select value={bookingType} onChange={e => setBookingType(e.target.value)}>
+                                    <option value="WALK_IN">Public Walk-In</option>
+                                    <option value="PRIVATE">Private Event</option>
+                                </select>
+                            </div>
+                            <div className="row">
+                                <div className="form-group">
+                                    <label>Start</label>
+                                    <input type="datetime-local" required onChange={e => setStartTime(e.target.value)} />
+                                </div>
+                                <div className="form-group">
+                                    <label>End</label>
+                                    <input type="datetime-local" required onChange={e => setEndTime(e.target.value)} />
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <label>Drivers ({driverCount})</label>
+                                <input type="range" min="1" max={selectedTrack.maxKarts} value={driverCount} onChange={e => setDriverCount(e.target.value)} />
+                            </div>
+                            <div className="form-actions">
+                                <button type="submit">Confirm Booking</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             )}
         </div>

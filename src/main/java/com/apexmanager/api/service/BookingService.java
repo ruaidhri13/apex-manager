@@ -58,6 +58,10 @@ public class BookingService {
         }
     }
 
+    public List<Booking> getAllBookings() {
+        return bookingRepository.findAll();
+    }
+
     private void checkTrackAvailability(Booking newBooking) {
         // 1. Get all existing bookings for this track
         List<Booking> existingBookings = bookingRepository.findByTrackId(newBooking.getTrack().getId());

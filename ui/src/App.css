@@ -1,136 +1,287 @@
-/* App.css - Modern Dashboard Theme */
+/* App.css - Apex Racing Dark Theme */
 :root {
-  --primary: #2563eb;       /* Professional Blue */
-  --primary-hover: #1d4ed8;
-  --bg-color: #f8fafc;      /* Light Grey Background */
-  --card-bg: #ffffff;
-  --text-dark: #1e293b;
-  --text-light: #64748b;
-  --border: #e2e8f0;
-  --success: #10b981;
-  --danger: #ef4444;
+  --sidebar-width: 260px;
+  --primary: #ef4444;       /* Ferrari Red */
+  --primary-hover: #dc2626; /* Darker Red */
+  --bg-dark: #0f172a;       /* Deep Navy/Black */
+  --bg-card: #1e293b;       /* Lighter Slate for cards */
+  --text-main: #f8fafc;     /* White text */
+  --text-muted: #94a3b8;    /* Grey text */
+  --border: #334155;
+  --sidebar-bg: #0f172a;    /* Match background for seamless look */
 }
 
 body {
   margin: 0;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: var(--bg-color);
-  color: var(--text-dark);
-  -webkit-font-smoothing: antialiased;
+  background-color: var(--bg-dark);
+  font-family: 'Inter', sans-serif;
+  color: var(--text-main);
 }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 40px 20px;
+.dashboard {
+  display: flex;
+  min-height: 100vh;
 }
 
-h1 {
-  font-size: 2.5rem;
+/* SIDEBAR */
+.sidebar {
+  width: var(--sidebar-width);
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border);
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  height: 100vh;
+  box-sizing: border-box; /* Fixes width calculation */
+}
+
+.logo {
+  font-size: 1.5rem;
   font-weight: 800;
   margin-bottom: 40px;
-  text-align: center;
-  background: linear-gradient(to right, var(--primary), #60a5fa);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-style: italic; /* Race car style */
 }
 
-/* Grid Layout for Tracks */
-.track-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 25px;
+.sidebar nav button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 12px 15px;
+  color: var(--text-muted);
+  font-weight: 500;
+  border-radius: 8px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1rem;
 }
 
-/* Modern Card Styling */
-.track-card {
-  background: var(--card-bg);
+.sidebar nav button:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: white;
+}
+
+.sidebar nav button.active {
+  background-color: var(--primary);
+  color: white;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3); /* Red Glow */
+}
+
+/* STATS BOX (Bottom of sidebar) */
+.stats-box {
+  margin-top: auto;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border);
+  color: white;
+  padding: 20px;
   border-radius: 12px;
-  padding: 25px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+.stat-value { font-size: 1.8rem; font-weight: 700; margin: 5px 0; color: var(--primary); }
+
+
+/* MAIN CONTENT */
+.main-content {
+  margin-left: var(--sidebar-width);
+  padding: 40px;
+  width: 100%;
+  box-sizing: border-box; /* CRITICAL FIX: Prevents clipping */
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+h1 { margin: 0; font-size: 2rem; font-weight: 700; font-style: italic; }
+
+.refresh-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-main);
+  width: auto;
+}
+.refresh-btn:hover { border-color: var(--primary); color: var(--primary); background: transparent; }
+
+/* GRID LAYOUT FIX */
+.track-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); /* Slightly wider cards */
+  gap: 30px;
+  padding-bottom: 50px;
+}
+
+/* TRACK CARD */
+.track-card {
+  background: var(--bg-card);
+  border-radius: 16px;
+  overflow: hidden;
   border: 1px solid var(--border);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .track-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+  border-color: var(--primary);
 }
 
-.track-card h2 {
-  margin-top: 0;
-  color: var(--text-dark);
+.card-image {
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+  position: relative;
 }
 
-.track-card p {
-  color: var(--text-light);
-  margin: 10px 0;
-  font-size: 0.95rem;
+/* BADGE STYLING */
+.badge {
+  position: absolute;
+  top: 15px; right: 15px;
+  background: var(--primary);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 4px; /* Sharper corners for race look */
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
 }
 
-.track-card strong {
-  color: var(--text-dark);
+.card-body { padding: 25px; }
+
+.card-header h2 { margin: 0; color: white; }
+.price { color: var(--primary); font-size: 1.2rem; font-weight: 700; }
+.price small { color: var(--text-muted); font-size: 0.8rem; font-weight: 400; }
+
+/* FLEET VISUALS */
+.fleet-visual {
+  background: rgba(0,0,0,0.2);
+  padding: 15px;
+  border-radius: 8px;
+  margin: 20px 0;
+  border: 1px solid var(--border);
 }
 
-/* Buttons */
+.fleet-visual .label { color: var(--text-muted); margin-bottom: 10px; display: block; }
+
+.kart-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.kart-dot {
+  width: 8px; height: 8px;
+  background-color: #10b981; /* Green Status */
+  border-radius: 2px;
+  box-shadow: 0 0 5px rgba(16, 185, 129, 0.4); /* Glow effect */
+}
+
+/* BUTTONS */
 button {
-  background-color: var(--primary);
+  background: var(--primary);
   color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 14px;
   border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  width: 100%;
-  margin-top: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
+button:hover { background: var(--primary-hover); }
 
-button:hover {
-  background-color: var(--primary-hover);
-}
 
-/* Modal / Form Styling */
-.booking-form {
+/* MODAL FORM (Dark Mode) */
+.modal-overlay {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: white;
-  padding: 30px;
-  border-radius: 16px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
-  width: 90%;
-  max-width: 400px;
-  border: 1px solid var(--border);
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.8); /* Darker overlay */
+  display: flex;
+  justify-content: center;
+  align-items: center;
   z-index: 1000;
 }
 
-/* Form Inputs */
+.booking-form {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: white;
+}
+
 input, select {
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  color: white;
+}
+
+label { color: var(--text-muted); }
+
+.close-x { color: var(--text-muted); font-size: 2rem; line-height: 1rem; }
+.close-x:hover { color: white; }
+
+/* --- TABLES (Bookings) --- */
+.table-container {
+  background: var(--bg-card);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.booking-table {
   width: 100%;
-  padding: 10px;
-  margin-top: 5px;
+  border-collapse: collapse;
+  color: white;
+}
+
+.booking-table th {
+  background: rgba(255,255,255,0.05);
+  text-align: left;
+  padding: 15px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.booking-table td {
+  padding: 15px;
+  border-bottom: 1px solid var(--border);
+}
+
+.booking-table tr:hover { background: rgba(255,255,255,0.02); }
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.status-badge.PRIVATE { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid #ef4444; }
+.status-badge.WALK_IN { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid #10b981; }
+
+
+/* --- SETTINGS --- */
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.setting-card {
+  background: var(--bg-card);
+  padding: 20px;
+  border-radius: 12px;
   border: 1px solid var(--border);
-  border-radius: 6px;
-  box-sizing: border-box; /* Fixes padding issues */
 }
 
-label {
-  display: block;
-  margin-bottom: 15px;
-  font-weight: 500;
-  font-size: 0.9rem;
-}
+.setting-card h3 { margin-top: 0; color: var(--primary); }
 
-.cancel-btn {
-  background-color: transparent;
-  color: var(--text-light);
-  border: 1px solid var(--border);
-  margin-top: 10px;
+.setting-row { margin-bottom: 15px; }
+.setting-row label { display: block; margin-bottom: 5px; color: var(--text-muted); }
+.setting-row input {
+  width: 100%;
+  background: rgba(0,0,0,0.2);
+  border-color: var(--border);
+  color: white;
 }
-
-.cancel-btn:hover {
-  background-color: var(--bg-color);
-  color: var(--text-dark);
-}
+.setting-row input:focus { border-color: var(--primary); outline: none; }

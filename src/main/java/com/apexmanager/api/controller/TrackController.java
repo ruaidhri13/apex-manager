@@ -20,4 +20,14 @@ public class TrackController {
     public List<Track> getAllTracks() {
         return trackRepository.findAll();
     }
+
+    // PUT http://localhost:8080/api/tracks/1
+    @PutMapping("/{id}")
+    public Track updateTrack(@PathVariable Long id, @RequestBody Track trackDetails) {
+        Track track = trackRepository.findById(id).orElseThrow();
+        // Update the prices
+        track.setWalkinPrice(trackDetails.getWalkinPrice());
+        track.setPrivateHourlyRatePp(trackDetails.getPrivateHourlyRatePp());
+        return trackRepository.save(track);
+    }
 }

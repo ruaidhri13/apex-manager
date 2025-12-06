@@ -26,4 +26,10 @@ public class BookingController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    // GET http://localhost:8080/api/bookings
+    @GetMapping
+    public java.util.List<Booking> getAllBookings() {
+        return bookingService.getAllBookings();
+    }
 }
