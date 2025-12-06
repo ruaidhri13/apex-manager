@@ -9,6 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/tracks")
+@CrossOrigin(origins = "http://localhost:5173") // <--- ALLOWS REACT TO TALK TO JAVA
 public class TrackController {
 
     @Autowired
