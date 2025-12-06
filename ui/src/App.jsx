@@ -14,11 +14,13 @@ function App() {
     const [bookings, setBookings] = useState([])
     const [selectedTrack, setSelectedTrack] = useState(null)
 
+    // Carousel State
+    const [currentTrackIndex, setCurrentTrackIndex] = useState(0)
+
     // Form State
     const [driverCount, setDriverCount] = useState(1)
     const [bookingType, setBookingType] = useState("WALK_IN")
     const [startTime, setStartTime] = useState("")
-    // REMOVED: endTime state (we calculate it automatically)
 
     useEffect(() => {
         fetchTracks()
@@ -40,23 +42,53 @@ function App() {
             .catch(error => console.error("Error fetching bookings:", error))
     }
 
+    // --- CAROUSEL LOGIC ---
+    const handleNextTrack = () => {
+        setCurrentTrackIndex((prevIndex) => (prevIndex + 1) % tracks.length)
+    }
+
+    const handlePrevTrack = () => {
+        setCurrentTrackIndex((prevIndex) => (prevIndex - 1 + tracks.length) % tracks.length)
+    }
+
+    const getCardClass = (index) => {
+        if (index === currentTrackIndex) return "active"
+
+        // Calculate Previous Index (Handling loop wrapping)
+        const prevIndex = (currentTrackIndex - 1 + tracks.length) % tracks.length
+        if (index === prevIndex) return "prev"
+
+        // Calculate Next Index (Handling loop wrapping)
+        const nextIndex = (currentTrackIndex + 1) % tracks.length
+        if (index === nextIndex) return "next"
+
+        return "hidden"
+    }
+
     const handleBookClick = (track) => {
         setSelectedTrack(track)
         setDriverCount(1)
         setBookingType("WALK_IN")
-        setStartTime("") // Reset time
+        setStartTime("")
+    }
+
+    const handleUpdatePrice = (trackId, newPrice, type) => {
+        const track = tracks.find(t => t.id === trackId)
+        const updatedTrack = { ...track }
+        if (type === 'walkin') updatedTrack.walkinPrice = newPrice
+        if (type === 'private') updatedTrack.privateHourlyRatePp = newPrice
+
+        axios.put(`http://localhost:8080/api/tracks/${trackId}`, updatedTrack)
+            .then(() => fetchTracks())
+            .catch(err => alert("Update failed"))
     }
 
     const submitBooking = (e) => {
         e.preventDefault()
 
-        // --- AUTOMATIC END TIME LOGIC ---
-        // 1. Create a Date object from the user's start time
+        // Automatic End Time Logic (+1 Hour)
         const startDate = new Date(startTime)
-        // 2. Add 1 Hour (60 minutes * 60 seconds * 1000 ms)
         const endDate = new Date(startDate.getTime() + (60 * 60 * 1000))
-        // 3. Convert back to string format for Java (ISO-ish)
-        // We adjust for timezone offset to keep local time correct
         const tzOffset = endDate.getTimezoneOffset() * 60000
         const localEndDate = new Date(endDate - tzOffset).toISOString().slice(0, 16)
 
@@ -64,7 +96,7 @@ function App() {
             track: { id: selectedTrack.id },
             bookingType: bookingType,
             startTime: startTime,
-            endTime: localEndDate, // Automatically set to +1 Hour
+            endTime: localEndDate,
             driverCount: parseInt(driverCount),
             totalPrice: 50.00,
             status: "CONFIRMED"
@@ -81,46 +113,55 @@ function App() {
             })
     }
 
-    const handleUpdatePrice = (trackId, newPrice, type) => {
-        const track = tracks.find(t => t.id === trackId)
-        const updatedTrack = { ...track }
-        if (type === 'walkin') updatedTrack.walkinPrice = newPrice
-        if (type === 'private') updatedTrack.privateHourlyRatePp = newPrice
-
-        axios.put(`http://localhost:8080/api/tracks/${trackId}`, updatedTrack)
-            .then(() => fetchTracks())
-            .catch(err => alert("Update failed"))
-    }
-
     const renderContent = () => {
+        // 1. OVERVIEW TAB (3D CAROUSEL)
         if (activeView === "overview") {
+            if (tracks.length === 0) return <p style={{textAlign:'center', marginTop: '50px'}}>Loading fleet...</p>
+
             return (
-                <div className="track-grid">
-                    {tracks.map(track => (
-                        <div key={track.id} className="track-card">
-                            <div className="card-image" style={{ backgroundImage: `url(${TRACK_IMAGES[track.id]})` }}>
+                <div className="carousel-container">
+
+                    <button className="nav-btn prev" onClick={handlePrevTrack}>‹</button>
+
+                    {tracks.map((track, index) => (
+                        <div
+                            key={track.id}
+                            className={`track-spotlight ${getCardClass(index)}`}
+                        >
+                            <div className="spotlight-image" style={{ backgroundImage: `url(${TRACK_IMAGES[track.id]})` }}>
                                 <span className="badge">{track.maxKarts} Kart Fleet</span>
                             </div>
-                            <div className="card-body">
-                                <div className="card-header">
+
+                            <div className="spotlight-body">
+                                <div className="spotlight-header">
                                     <h2>{track.name}</h2>
-                                    <span className="price">£{track.walkinPrice}<small>/lap</small></span>
+                                    <div className="spotlight-price">£{track.walkinPrice}<small style={{fontSize:'0.7rem', color:'#94a3b8'}}>/lap</small></div>
                                 </div>
+
                                 <div className="fleet-visual">
-                                    <span className="label">Live Fleet Status</span>
+                                    <span className="label">Live Kart Availability</span>
                                     <div className="kart-grid">
                                         {Array.from({ length: track.maxKarts }).map((_, i) => (
                                             <span key={i} className="kart-dot" title={`Kart #${i+1}`}></span>
                                         ))}
                                     </div>
                                 </div>
-                                <button onClick={() => handleBookClick(track)}>Book Track</button>
+
+                                <div className="spotlight-footer">
+                                    <button onClick={() => handleBookClick(track)}>Select Track</button>
+                                </div>
                             </div>
                         </div>
                     ))}
+
+                    <button className="nav-btn next" onClick={handleNextTrack}>›</button>
+
                 </div>
             )
-        } else if (activeView === "calendar") {
+        }
+
+        // 2. BOOKINGS TAB
+        else if (activeView === "calendar") {
             return (
                 <div className="table-container">
                     <table className="booking-table">
@@ -143,7 +184,10 @@ function App() {
                     {bookings.length === 0 && <p style={{textAlign: 'center', marginTop: '20px'}}>No bookings found.</p>}
                 </div>
             )
-        } else if (activeView === "settings") {
+        }
+
+        // 3. SETTINGS TAB
+        else if (activeView === "settings") {
             return (
                 <div className="settings-panel">
                     <h2>⚙️ Pricing Manager</h2>
@@ -192,17 +236,18 @@ function App() {
 
             <div className={`drawer-panel ${selectedTrack ? 'open' : ''}`}>
                 {selectedTrack && (
-                    <div className="drawer-content">
+                    <form className="drawer-content" onSubmit={submitBooking}>
+
                         <div className="drawer-header">
                             <h2>Book Session</h2>
-                            <button className="close-btn" onClick={() => setSelectedTrack(null)}>×</button>
+                            <button type="button" className="close-btn" onClick={() => setSelectedTrack(null)}>×</button>
                         </div>
 
-                        <div className="track-preview-mini" style={{ backgroundImage: `url(${TRACK_IMAGES[selectedTrack.id]})` }}>
-                            <div className="mini-badge">{selectedTrack.name}</div>
-                        </div>
+                        <div className="drawer-body">
+                            <div className="track-preview-mini" style={{ backgroundImage: `url(${TRACK_IMAGES[selectedTrack.id]})` }}>
+                                <div className="mini-badge">{selectedTrack.name}</div>
+                            </div>
 
-                        <form onSubmit={submitBooking}>
                             <div className="form-group">
                                 <label>Event Type</label>
                                 <select value={bookingType} onChange={e => setBookingType(e.target.value)}>
@@ -218,32 +263,50 @@ function App() {
                                 <label>Session Start Time</label>
                                 <input type="datetime-local" required onChange={e => setStartTime(e.target.value)} />
                                 <small style={{color: '#94a3b8', display: 'block', marginTop: '5px'}}>
-                                    Duration: 1 Hour (Standard Session)
+                                    Standard Session Duration: 1 Hour
                                 </small>
                             </div>
 
+                            {/* STARTING GRID VISUALIZER */}
                             <div className="form-group">
-                                <label>Number of Drivers: <span style={{color: 'white', fontWeight: 'bold'}}>{driverCount}</span></label>
-                                <input
-                                    type="range" min="1" max={selectedTrack.maxKarts}
-                                    value={driverCount} onChange={e => setDriverCount(e.target.value)}
-                                />
-                                <div style={{display:'flex', justifyContent:'space-between', color: '#64748b', fontSize: '0.8rem'}}>
-                                    <span>1</span>
-                                    <span>{selectedTrack.maxKarts} (Max)</span>
+                                <label>Select Drivers on Grid: <span style={{color: 'white', fontWeight: 'bold'}}>{driverCount}</span></label>
+
+                                <div className="starting-grid-container">
+                                    <div className="starting-grid">
+                                        {Array.from({ length: Math.ceil(selectedTrack.maxKarts / 2) }).map((_, rowIndex) => {
+                                            const posLeft = (rowIndex * 2) + 1;
+                                            const posRight = (rowIndex * 2) + 2;
+
+                                            return (
+                                                <div key={rowIndex} className="grid-row">
+                                                    {posLeft <= selectedTrack.maxKarts && (
+                                                        <div className={`grid-slot ${driverCount >= posLeft ? 'filled' : ''}`} onClick={() => setDriverCount(posLeft)}>
+                                                            <span>P{posLeft}</span>
+                                                        </div>
+                                                    )}
+                                                    {posRight <= selectedTrack.maxKarts && (
+                                                        <div className={`grid-slot ${driverCount >= posRight ? 'filled' : ''}`} onClick={() => setDriverCount(posRight)}>
+                                                            <span>P{posRight}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )
+                                        }).reverse()}
+                                    </div>
                                 </div>
                             </div>
+                        </div>
 
+                        <div className="drawer-footer">
                             <div className="total-box">
-                                <span>Estimated Total:</span>
+                                <span>Total:</span>
                                 <span className="total-price">
                   £{(bookingType === 'PRIVATE' ? selectedTrack.privateHourlyRatePp : selectedTrack.walkinPrice) * driverCount}
                 </span>
                             </div>
-
                             <button type="submit" className="confirm-btn">Confirm & Pay</button>
-                        </form>
-                    </div>
+                        </div>
+                    </form>
                 )}
             </div>
         </div>
