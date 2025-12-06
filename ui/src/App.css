@@ -285,3 +285,112 @@ label { color: var(--text-muted); }
   color: white;
 }
 .setting-row input:focus { border-color: var(--primary); outline: none; }
+
+/* --- SLIDING DRAWER --- */
+
+/* The dark background overlay */
+.drawer-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(2px);
+  z-index: 998;
+  opacity: 0;
+  pointer-events: none; /* Click through when hidden */
+  transition: opacity 0.3s ease;
+}
+
+.drawer-overlay.open {
+  opacity: 1;
+  pointer-events: auto; /* Catch clicks when open */
+}
+
+/* The Sliding Panel */
+.drawer-panel {
+  position: fixed;
+  top: 0;
+  right: -450px; /* Hidden off-screen */
+  width: 400px;
+  height: 100vh;
+  background: var(--bg-card);
+  border-left: 1px solid var(--border);
+  box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+  z-index: 999;
+  transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1); /* Smooth spring-like slide */
+  padding: 30px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.drawer-panel.open {
+  right: 0; /* Slide in */
+}
+
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.drawer-header h2 { margin: 0; color: white; font-style: italic; }
+
+.close-btn {
+  background: transparent;
+  width: auto;
+  font-size: 2rem;
+  padding: 0;
+  line-height: 1;
+  color: var(--text-muted);
+}
+.close-btn:hover { color: white; background: transparent; }
+
+/* Mini Preview Image in Drawer */
+.track-preview-mini {
+  height: 120px;
+  border-radius: 12px;
+  background-size: cover;
+  background-position: center;
+  margin-bottom: 25px;
+  position: relative;
+  border: 1px solid var(--border);
+}
+
+.mini-badge {
+  position: absolute;
+  bottom: 10px; left: 10px;
+  background: rgba(0,0,0,0.8);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* Price Calculation Box */
+.total-box {
+  background: rgba(239, 68, 68, 0.1); /* Red tint */
+  border: 1px solid var(--primary);
+  padding: 20px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 30px;
+  margin-bottom: 20px;
+}
+
+.total-box span { color: var(--text-muted); font-weight: 600; }
+.total-box .total-price { color: var(--primary); font-size: 1.5rem; font-weight: 800; }
+
+.confirm-btn {
+  background: var(--primary);
+  width: 100%;
+  padding: 15px;
+  font-size: 1rem;
+  margin-top: 10px;
+}
+.confirm-btn:hover {
+  background: var(--primary-hover);
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+}
