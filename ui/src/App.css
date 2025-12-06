@@ -1,42 +1,136 @@
-#root {
-  max-width: 1280px;
+/* App.css - Modern Dashboard Theme */
+:root {
+  --primary: #2563eb;       /* Professional Blue */
+  --primary-hover: #1d4ed8;
+  --bg-color: #f8fafc;      /* Light Grey Background */
+  --card-bg: #ffffff;
+  --text-dark: #1e293b;
+  --text-light: #64748b;
+  --border: #e2e8f0;
+  --success: #10b981;
+  --danger: #ef4444;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-dark);
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 40px 20px;
+}
+
+h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 40px;
   text-align: center;
+  background: linear-gradient(to right, var(--primary), #60a5fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+/* Grid Layout for Tracks */
+.track-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Modern Card Styling */
+.track-card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border);
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.track-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
-.card {
-  padding: 2em;
+.track-card h2 {
+  margin-top: 0;
+  color: var(--text-dark);
 }
 
-.read-the-docs {
-  color: #888;
+.track-card p {
+  color: var(--text-light);
+  margin: 10px 0;
+  font-size: 0.95rem;
+}
+
+.track-card strong {
+  color: var(--text-dark);
+}
+
+/* Buttons */
+button {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: 100%;
+  margin-top: 15px;
+}
+
+button:hover {
+  background-color: var(--primary-hover);
+}
+
+/* Modal / Form Styling */
+.booking-form {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 400px;
+  border: 1px solid var(--border);
+  z-index: 1000;
+}
+
+/* Form Inputs */
+input, select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-sizing: border-box; /* Fixes padding issues */
+}
+
+label {
+  display: block;
+  margin-bottom: 15px;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.cancel-btn {
+  background-color: transparent;
+  color: var(--text-light);
+  border: 1px solid var(--border);
+  margin-top: 10px;
+}
+
+.cancel-btn:hover {
+  background-color: var(--bg-color);
+  color: var(--text-dark);
 }
