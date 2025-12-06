@@ -62,17 +62,30 @@ public class BookingService {
         // 1. Get all existing bookings for this track
         List<Booking> existingBookings = bookingRepository.findByTrackId(newBooking.getTrack().getId());
 
+        int currentCapacityUsed = 0;
+
         for (Booking existing : existingBookings) {
-            // Check if times overlap
+            // Only care if times overlap
             if (isOverlappingBooking(newBooking, existing)) {
 
-                // Conflict Rule:
-                // If EITHER the new one OR the existing one is PRIVATE, it's a conflict.
-                // (Private means "Exclusive use of track")
+                // Conflict Rule A: Exclusivity
+                // If EITHER is PRIVATE, it's a hard fail.
                 if (newBooking.getBookingType() == BookingType.PRIVATE ||
                         existing.getBookingType() == BookingType.PRIVATE) {
                     throw new RuntimeException("Track is already booked for an exclusive event at this time.");
                 }
+
+                // Conflict Rule B: Capacity Counting
+                // If we are here, both are Public. We must count heads.
+                currentCapacityUsed += existing.getDriverCount();
+            }
+        }
+
+        // Final Capacity Check for Public events
+        if (newBooking.getBookingType() != BookingType.PRIVATE) {
+            int trackLimit = trackRepository.findById(newBooking.getTrack().getId()).get().getMaxKarts();
+            if (currentCapacityUsed + newBooking.getDriverCount() > trackLimit) {
+                throw new RuntimeException("Track is full! Remaining capacity: " + (trackLimit - currentCapacityUsed));
             }
         }
     }
