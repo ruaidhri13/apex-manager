@@ -1,12 +1,10 @@
 package com.apexmanager.api.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "tracks")
-@Data // Lombok generates Getters, Setters, and toString automatically
 public class Track {
 
     @Id
@@ -24,4 +22,21 @@ public class Track {
 
     @Column(name = "walkin_price", nullable = false)
     private BigDecimal walkinPrice;
+
+    // --- MANUAL GETTERS AND SETTERS ---
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public Integer getMaxKarts() { return maxKarts; }
+    public void setMaxKarts(Integer maxKarts) { this.maxKarts = maxKarts; }
+
+    public BigDecimal getPrivateHourlyRatePp() { return privateHourlyRatePp; }
+    public void setPrivateHourlyRatePp(BigDecimal privateHourlyRatePp) { this.privateHourlyRatePp = privateHourlyRatePp; }
+
+    public BigDecimal getWalkinPrice() { return walkinPrice; }
+    public void setWalkinPrice(BigDecimal walkinPrice) { this.walkinPrice = walkinPrice; }
 }

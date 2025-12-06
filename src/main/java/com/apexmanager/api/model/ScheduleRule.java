@@ -1,12 +1,10 @@
 package com.apexmanager.api.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
 import java.time.LocalTime;
 
 @Entity
 @Table(name = "schedule_rules")
-@Data
 public class ScheduleRule {
 
     @Id
@@ -24,4 +22,21 @@ public class ScheduleRule {
 
     @Column(name = "restriction_type", nullable = false)
     private String restrictionType;
+
+    // --- MANUAL GETTERS AND SETTERS ---
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getDayOfWeek() { return dayOfWeek; }
+    public void setDayOfWeek(String dayOfWeek) { this.dayOfWeek = dayOfWeek; }
+
+    public LocalTime getStartTime() { return startTime; }
+    public void setStartTime(LocalTime startTime) { this.startTime = startTime; }
+
+    public LocalTime getEndTime() { return endTime; }
+    public void setEndTime(LocalTime endTime) { this.endTime = endTime; }
+
+    public String getRestrictionType() { return restrictionType; }
+    public void setRestrictionType(String restrictionType) { this.restrictionType = restrictionType; }
 }
