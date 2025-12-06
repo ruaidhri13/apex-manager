@@ -7,6 +7,5 @@ import java.util.List;
 
 @Repository
 public interface ScheduleRuleRepository extends JpaRepository<ScheduleRule, Long> {
-    // Custom query: Spring automatically figures out the SQL for this!
     List<ScheduleRule> findByDayOfWeek(String dayOfWeek);
 }

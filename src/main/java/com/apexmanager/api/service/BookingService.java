@@ -24,33 +24,27 @@ public class BookingService {
     @Autowired
     private TrackRepository trackRepository;
 
-    // The Main Method: Attempt to create a booking
     public Booking createBooking(Booking booking) {
 
-        // 1. Check for "Sacred Public Times"
-        // If they want a PRIVATE booking, we must check the ScheduleRules
         if (booking.getBookingType() == BookingType.PRIVATE) {
             checkSacredTimeConflicts(booking);
         }
 
-        // 2. Check for Double Bookings (Exclusive Access)
         checkTrackAvailability(booking);
 
-        // If we get here, no rules were broken! Save it.
         return bookingRepository.save(booking);
     }
 
-    private void checkSacredTimeConflicts(Booking booking) {
-        // Get the day of the week (e.g., "SATURDAY")
-        String dayOfWeek = booking.getStartTime().getDayOfWeek().toString();
+    public List<Booking> getAllBookings() {
+        return bookingRepository.findAll();
+    }
 
-        // Fetch rules for this day
+    private void checkSacredTimeConflicts(Booking booking) {
+        String dayOfWeek = booking.getStartTime().getDayOfWeek().toString();
         List<ScheduleRule> rules = scheduleRuleRepository.findByDayOfWeek(dayOfWeek);
 
-        // Check each rule
         for (ScheduleRule rule : rules) {
             if ("LOCKED_PUBLIC".equals(rule.getRestrictionType())) {
-                // Check if the requested time overlaps with this restricted window
                 if (isOverlappingRule(booking, rule)) {
                     throw new RuntimeException("Cannot book PRIVATE event during LOCKED_PUBLIC hours.");
                 }
@@ -58,34 +52,23 @@ public class BookingService {
         }
     }
 
-    public List<Booking> getAllBookings() {
-        return bookingRepository.findAll();
-    }
-
     private void checkTrackAvailability(Booking newBooking) {
-        // 1. Get all existing bookings for this track
         List<Booking> existingBookings = bookingRepository.findByTrackId(newBooking.getTrack().getId());
 
         int currentCapacityUsed = 0;
 
         for (Booking existing : existingBookings) {
-            // Only care if times overlap
             if (isOverlappingBooking(newBooking, existing)) {
 
-                // Conflict Rule A: Exclusivity
-                // If EITHER is PRIVATE, it's a hard fail.
                 if (newBooking.getBookingType() == BookingType.PRIVATE ||
                         existing.getBookingType() == BookingType.PRIVATE) {
                     throw new RuntimeException("Track is already booked for an exclusive event at this time.");
                 }
 
-                // Conflict Rule B: Capacity Counting
-                // If we are here, both are Public. We must count heads.
                 currentCapacityUsed += existing.getDriverCount();
             }
         }
 
-        // Final Capacity Check for Public events
         if (newBooking.getBookingType() != BookingType.PRIVATE) {
             int trackLimit = trackRepository.findById(newBooking.getTrack().getId()).get().getMaxKarts();
             if (currentCapacityUsed + newBooking.getDriverCount() > trackLimit) {
@@ -94,18 +77,14 @@ public class BookingService {
         }
     }
 
-    // Helper to check overlap between a Booking and a ScheduleRule (Time only)
     private boolean isOverlappingRule(Booking booking, ScheduleRule rule) {
         LocalTime reqStart = booking.getStartTime().toLocalTime();
         LocalTime reqEnd = booking.getEndTime().toLocalTime();
 
-        // Logic: (StartA < EndB) and (EndA > StartB)
         return reqStart.isBefore(rule.getEndTime()) && reqEnd.isAfter(rule.getStartTime());
     }
 
-    // Helper to check overlap between two Bookings (DateTime)
     private boolean isOverlappingBooking(Booking newBooking, Booking existingBooking) {
-        // Logic: (StartA < EndB) and (EndA > StartB)
         return newBooking.getStartTime().isBefore(existingBooking.getEndTime())
                 && newBooking.getEndTime().isAfter(existingBooking.getStartTime());
     }

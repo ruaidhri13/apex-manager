@@ -1,10 +1,9 @@
-/* App.css - Apex Racing Dark Theme (Optimized Layout) */
 :root {
   --sidebar-width: 260px;
-  --primary: #ef4444;       /* Ferrari Red */
+  --primary: #ef4444;
   --primary-hover: #dc2626;
-  --bg-dark: #0f172a;       /* Deep Navy */
-  --bg-card: #1e293b;       /* Slate */
+  --bg-dark: #0f172a;
+  --bg-card: #1e293b;
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
   --border: #334155;
@@ -17,7 +16,7 @@ body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   color: var(--text-main);
   height: 100vh;
-  overflow: hidden; /* Prevent body scroll, handle inside main-content */
+  overflow: hidden;
 }
 
 .dashboard {
@@ -25,7 +24,6 @@ body {
   height: 100vh;
 }
 
-/* --- SIDEBAR --- */
 .sidebar {
   width: var(--sidebar-width);
   background: var(--sidebar-bg);
@@ -37,12 +35,16 @@ body {
 }
 
 .logo {
-  font-size: 1.5rem;
-  font-weight: 800;
   margin-bottom: 40px;
-  color: var(--primary);
-  text-transform: uppercase;
-  font-style: italic;
+  display: flex;
+  justify-content: center;
+}
+
+.logo img {
+  max-width: 160px;
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 .sidebar nav button {
@@ -78,11 +80,10 @@ body {
 .stat-value { font-size: 1.8rem; font-weight: 700; margin: 5px 0; color: var(--primary); }
 
 
-/* --- MAIN CONTENT AREA --- */
 .main-content {
   flex-grow: 1;
   padding: 40px;
-  overflow-y: auto; /* Allow scrolling only here */
+  overflow-y: auto;
   height: 100vh;
   box-sizing: border-box;
 }
@@ -94,7 +95,7 @@ header {
   margin-bottom: 30px;
 }
 
-h1 { margin: 0; font-size: 2rem; font-weight: 700; font-style: italic; }
+h1 { margin: 0; font-size: 2rem; font-weight: 700; font-style: italic; padding-right: 50px; }
 
 .refresh-btn {
   background: transparent;
@@ -105,18 +106,13 @@ h1 { margin: 0; font-size: 2rem; font-weight: 700; font-style: italic; }
 }
 .refresh-btn:hover { border-color: var(--primary); color: var(--primary); }
 
-/* --- GRID LAYOUT FIX (Stretched Cards) --- */
 .track-grid {
   display: grid;
-  /* CHANGED: Increased from 400px to 500px.
-     This forces the cards to be much wider before breaking to a new line,
-     filling the empty space on the right. */
   grid-template-columns: repeat(auto-fit, minmax(800px, 1fr));
   gap: 30px;
   padding-bottom: 100px;
 }
 
-/* TRACK CARD */
 .track-card {
   background: var(--bg-card);
   border-radius: 16px;
@@ -134,7 +130,7 @@ h1 { margin: 0; font-size: 2rem; font-weight: 700; font-style: italic; }
 }
 
 .card-image {
-  height: 220px; /* Taller images */
+  height: 220px;
   background-size: cover;
   background-position: center;
   position: relative;
@@ -175,7 +171,7 @@ h1 { margin: 0; font-size: 2rem; font-weight: 700; font-style: italic; }
   box-shadow: 0 0 5px rgba(16, 185, 129, 0.4);
 }
 
-.track-card button { margin-top: auto; } /* Push button to bottom */
+.track-card button { margin-top: auto; }
 
 button {
   background: var(--primary);
@@ -192,7 +188,6 @@ button {
 button:hover { background: var(--primary-hover); }
 
 
-/* --- SLIDING DRAWER (Improved Layout) --- */
 .drawer-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -207,8 +202,8 @@ button:hover { background: var(--primary-hover); }
 
 .drawer-panel {
   position: fixed;
-  top: 0; right: -600px; /* Hide off screen */
-  width: 500px; /* WIDER DRAWER */
+  top: 0; right: -600px;
+  width: 500px;
   height: 100vh;
   background: var(--bg-card);
   border-left: 1px solid var(--border);
@@ -216,12 +211,11 @@ button:hover { background: var(--primary-hover); }
   z-index: 999;
   transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
-  flex-direction: column; /* Flex layout to handle scrolling */
+  flex-direction: column;
 }
 
 .drawer-panel.open { right: 0; }
 
-/* Drawer Content Structure */
 .drawer-content {
   display: flex;
   flex-direction: column;
@@ -234,25 +228,23 @@ button:hover { background: var(--primary-hover); }
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-shrink: 0; /* Don't shrink header */
+  flex-shrink: 0;
 }
 .drawer-header h2 { margin: 0; color: white; font-style: italic; }
 .close-btn { width: auto; font-size: 2rem; padding: 0; background: none; color: var(--text-muted); }
 .close-btn:hover { color: white; }
 
-/* Scrollable Form Area */
 .drawer-body {
   padding: 25px;
-  overflow-y: auto; /* Scroll ONLY this middle part */
+  overflow-y: auto;
   flex-grow: 1;
 }
 
-/* Sticky Footer for Button */
 .drawer-footer {
   padding: 20px 25px;
   border-top: 1px solid var(--border);
-  background: var(--bg-card); /* Opaque background */
-  flex-shrink: 0; /* Don't shrink footer */
+  background: var(--bg-card);
+  flex-shrink: 0;
 }
 
 .track-preview-mini {
@@ -275,7 +267,6 @@ button:hover { background: var(--primary-hover); }
   font-size: 0.8rem;
 }
 
-/* Inputs & Grid */
 .form-group { margin-bottom: 20px; }
 label { color: var(--text-muted); display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; }
 
@@ -290,11 +281,9 @@ input, select {
 }
 input:focus, select:focus { border-color: var(--primary); outline: none; }
 
-/* Dark Date Picker */
 input[type="datetime-local"] { color-scheme: dark; }
 input[type="datetime-local"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
 
-/* Starting Grid */
 .starting-grid-container {
   background: rgba(0,0,0,0.3);
   padding: 20px;
@@ -331,7 +320,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator { filter: invert
 .grid-slot.filled::after { content: '🏎️'; text-shadow: 0 2px 4px rgba(0,0,0,0.5); font-size: 1.2rem; }
 .grid-slot span { position: absolute; top: -20px; font-size: 0.7rem; color: var(--text-muted); }
 
-/* Price Box */
 .total-box {
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid var(--primary);
@@ -345,7 +333,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator { filter: invert
 .total-box span { color: var(--text-muted); font-weight: 600; }
 .total-box .total-price { color: var(--primary); font-size: 1.4rem; font-weight: 800; }
 
-/* Table Styles */
 .table-container { background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
 .booking-table { width: 100%; border-collapse: collapse; color: white; }
 .booking-table th { background: rgba(255,255,255,0.05); text-align: left; padding: 15px; color: var(--text-muted); }
@@ -354,13 +341,11 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator { filter: invert
 .status-badge.PRIVATE { background: rgba(239, 68, 68, 0.2); color: #fca5a5; border: 1px solid #ef4444; }
 .status-badge.WALK_IN { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid #10b981; }
 
-/* Settings */
 .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
 .setting-card { background: var(--bg-card); padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
 .setting-card h3 { margin-top: 0; color: var(--primary); }
 .setting-row { margin-bottom: 15px; }
 
-/* --- 3D SHOWROOM CAROUSEL (TIGHT FAN FIX) --- */
 .carousel-container {
   display: flex;
   align-items: center;
@@ -370,7 +355,7 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator { filter: invert
   padding: 10px;
   perspective: 1000px;
   width: 50%;
-  overflow: visible; /* Clean edges */
+  overflow: visible;
 }
 
 .nav-btn {
@@ -392,7 +377,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator { filter: invert
   transition: all 0.2s;
 }
 
-/* Moved buttons slightly inward to ensure they don't get lost */
 .nav-btn.prev { left: 40px; }
 .nav-btn.next { right: 40px; }
 
@@ -402,10 +386,8 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator { filter: invert
   transform: translateY(-50%) scale(1.1);
 }
 
-/* Base Card Style */
 .track-spotlight {
   position: absolute;
-  /* WIDTH: 45% of the screen width (responsive) */
   width: 45vw;
   max-width: 600px;
   min-width: 320px;
@@ -420,9 +402,6 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator { filter: invert
   box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.5);
 }
 
-/* --- THE 3 STATES --- */
-
-/* 1. ACTIVE (Center) */
 .track-spotlight.active {
   opacity: 1;
   z-index: 10;
@@ -431,38 +410,30 @@ input[type="datetime-local"]::-webkit-calendar-picker-indicator { filter: invert
   border-color: var(--primary);
 }
 
-/* 2. PREVIOUS (Left) */
 .track-spotlight.prev {
   opacity: 0.5;
   z-index: 5;
-  /* CHANGED: Pull closer to center (-25%) to force overlap and prevent clipping */
-  /* CHANGED: Shrink more (0.75) to create depth */
   transform: translateX(-25%) scale(0.75) rotateY(25deg);
   filter: blur(3px);
   pointer-events: none;
   background: rgba(15, 23, 42, 0.9);
 }
 
-/* 3. NEXT (Right) */
 .track-spotlight.next {
   opacity: 0.5;
   z-index: 5;
-  /* CHANGED: Pull closer to center (25%) */
-  /* CHANGED: Shrink more (0.75) */
   transform: translateX(25%) scale(0.75) rotateY(-25deg);
   filter: blur(3px);
   pointer-events: none;
   background: rgba(15, 23, 42, 0.9);
 }
 
-/* 4. HIDDEN */
 .track-spotlight.hidden {
   opacity: 0;
   transform: scale(0);
   pointer-events: none;
 }
 
-/* Card Internals */
 .spotlight-image {
   height: 55%;
   background-size: cover;

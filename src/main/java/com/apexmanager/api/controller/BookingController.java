@@ -22,7 +22,7 @@ public class BookingController {
             return ResponseEntity.ok(newBooking);
         } catch (RuntimeException e) {
             // If the Service throws an error (like "Sacred Time Conflict"),
-            // we return a 400 Bad Request with the error message.
+            // return a 400 Bad Request with the error message.
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }

@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TrackRepository extends JpaRepository<Track, Long> {
-    // We don't need to write code here
-    // JpaRepository gives us .findAll(), .save(), .findById() for free.
+    // Don't need to write code here
+    // JpaRepository gives .findAll(), .save(), .findById() for free
 }

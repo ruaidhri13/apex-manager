@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import './App.css'
 
+const LOGO_IMAGE = "/APEX_Manager_Logo-removebg.png"
+
 const TRACK_IMAGES = {
-    1: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?q=80&w=1000&auto=format&fit=crop",
-    2: "https://images.unsplash.com/photo-1511994714008-b6d68a8b32a2?q=80&w=1000&auto=format&fit=crop",
-    3: "https://images.unsplash.com/photo-1596568288590-b186b51c3859?q=80&w=1000&auto=format&fit=crop"
+    1: "/Track_A.png",
+    2: "/Track_B.png",
+    3: "/Track_C.png"
 }
 
 function App() {
@@ -13,11 +15,8 @@ function App() {
     const [tracks, setTracks] = useState([])
     const [bookings, setBookings] = useState([])
     const [selectedTrack, setSelectedTrack] = useState(null)
-
-    // Carousel State
     const [currentTrackIndex, setCurrentTrackIndex] = useState(0)
 
-    // Form State
     const [driverCount, setDriverCount] = useState(1)
     const [bookingType, setBookingType] = useState("WALK_IN")
     const [startTime, setStartTime] = useState("")
@@ -42,7 +41,6 @@ function App() {
             .catch(error => console.error("Error fetching bookings:", error))
     }
 
-    // --- CAROUSEL LOGIC ---
     const handleNextTrack = () => {
         setCurrentTrackIndex((prevIndex) => (prevIndex + 1) % tracks.length)
     }
@@ -54,11 +52,9 @@ function App() {
     const getCardClass = (index) => {
         if (index === currentTrackIndex) return "active"
 
-        // Calculate Previous Index (Handling loop wrapping)
         const prevIndex = (currentTrackIndex - 1 + tracks.length) % tracks.length
         if (index === prevIndex) return "prev"
 
-        // Calculate Next Index (Handling loop wrapping)
         const nextIndex = (currentTrackIndex + 1) % tracks.length
         if (index === nextIndex) return "next"
 
@@ -114,7 +110,6 @@ function App() {
     }
 
     const renderContent = () => {
-        // 1. OVERVIEW TAB (3D CAROUSEL)
         if (activeView === "overview") {
             if (tracks.length === 0) return <p style={{textAlign:'center', marginTop: '50px'}}>Loading fleet...</p>
 
@@ -160,7 +155,6 @@ function App() {
             )
         }
 
-        // 2. BOOKINGS TAB
         else if (activeView === "calendar") {
             return (
                 <div className="table-container">
@@ -186,11 +180,10 @@ function App() {
             )
         }
 
-        // 3. SETTINGS TAB
         else if (activeView === "settings") {
             return (
                 <div className="settings-panel">
-                    <h2>⚙️ Pricing Manager</h2>
+                    <h2>Pricing Manager</h2>
                     <div className="settings-grid">
                         {tracks.map(track => (
                             <div key={track.id} className="setting-card">
@@ -214,24 +207,25 @@ function App() {
     return (
         <div className="dashboard">
             <aside className="sidebar">
-                <div className="logo">🏎️ ApexManager</div>
+                <div className="logo">
+                    <img src={LOGO_IMAGE} alt="Apex Manager Logo" />
+                </div>
                 <nav>
-                    <button className={activeView === "overview" ? "active" : ""} onClick={() => setActiveView("overview")}>🏁 Track Overview</button>
-                    <button className={activeView === "calendar" ? "active" : ""} onClick={() => setActiveView("calendar")}>📅 Bookings</button>
-                    <button className={activeView === "settings" ? "active" : ""} onClick={() => setActiveView("settings")}>⚙️ Settings</button>
+                    <button className={activeView === "overview" ? "active" : ""} onClick={() => setActiveView("overview")}>Track Overview</button>
+                    <button className={activeView === "calendar" ? "active" : ""} onClick={() => setActiveView("calendar")}>Bookings</button>
+                    <button className={activeView === "settings" ? "active" : ""} onClick={() => setActiveView("settings")}>Settings</button>
                 </nav>
             </aside>
 
             <main className="main-content">
                 <header>
                     <h1>{activeView === "overview" ? "Facility Status" : activeView.charAt(0).toUpperCase() + activeView.slice(1)}</h1>
-                    <button className="refresh-btn" onClick={() => window.location.reload()}>↻ Refresh System</button>
+                    <button className="refresh-btn" onClick={() => window.location.reload()}>Refresh System</button>
                 </header>
 
                 {renderContent()}
             </main>
 
-            {/* SIDE DRAWER (SLIDING PANEL) */}
             <div className={`drawer-overlay ${selectedTrack ? 'open' : ''}`} onClick={() => setSelectedTrack(null)}></div>
 
             <div className={`drawer-panel ${selectedTrack ? 'open' : ''}`}>
@@ -267,16 +261,16 @@ function App() {
                                 </small>
                             </div>
 
-                            {/* STARTING GRID VISUALIZER */}
                             <div className="form-group">
                                 <label>Select Drivers on Grid: <span style={{color: 'white', fontWeight: 'bold'}}>{driverCount}</span></label>
-
                                 <div className="starting-grid-container">
                                     <div className="starting-grid">
+                                        {/* Logic: Create pairs for the grid (Row 1: Pos 1,2 | Row 2: Pos 3,4)
+                                           We reverse the array so Position 1 is at the bottom (Front of grid)
+                                        */}
                                         {Array.from({ length: Math.ceil(selectedTrack.maxKarts / 2) }).map((_, rowIndex) => {
                                             const posLeft = (rowIndex * 2) + 1;
                                             const posRight = (rowIndex * 2) + 2;
-
                                             return (
                                                 <div key={rowIndex} className="grid-row">
                                                     {posLeft <= selectedTrack.maxKarts && (
@@ -306,6 +300,7 @@ function App() {
                             </div>
                             <button type="submit" className="confirm-btn">Confirm & Pay</button>
                         </div>
+
                     </form>
                 )}
             </div>
